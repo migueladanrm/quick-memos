@@ -5,8 +5,8 @@ import {
   Body,
   Param,
   Delete,
-  Put,
   Query,
+  Patch,
 } from '@nestjs/common';
 import { NotesService } from './notes.service';
 import { Prisma } from 'generated/prisma';
@@ -45,7 +45,7 @@ export class NotesController {
     return this.notesService.get(Number(id));
   }
 
-  @Put(':id')
+  @Patch(':id')
   async update(
     @Param('id') id: string,
     @Body() updateNoteDto: Prisma.NoteUpdateInput,
