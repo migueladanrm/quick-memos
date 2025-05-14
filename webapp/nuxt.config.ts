@@ -16,7 +16,13 @@ export default defineNuxtConfig({
 
   routeRules: {
     "/api/quickmemos/**": {
-      proxy: `${process.env.API_BASE_URL}/**`,
+      proxy: `${process.env.API_BASE_URL || process.env.NUXT_API_BASE_URL || "http://server:3500"}/**`,
     },
   },
+  runtimeConfig: {
+    apiBaseUrl: process.env.API_BASE_URL || process.env.NUXT_API_BASE_URL,
+    public: {
+      apiBaseUrl: process.env.API_BASE_URL || process.env.NUXT_API_BASE_URL,
+    },
+  }
 });
