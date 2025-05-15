@@ -1,0 +1,56 @@
+networks:
+  default:
+    driver: bridge
+
+services:
+  postgres:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=quickmemos
+      - POSTGRES_PASSWORD=quickmemos
+      - POSTGRES_DB=quickmemos
+    ports:
+      - "5432:5432"
+    volumes:
+      - quickmemos-db:/var/lib/postgresql/data
+    networks:
+      - default
+    healthcheck:
+      test: ["CMD", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  server:
+    image: quickmemos/server:latest
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    environment:
+      - PORT=3500
+      - DATABASE_URL=postgres://quickmemos:quickmemos@postgres:5432/quickmemos
+    ports:
+      - "3500:3500"
+    networks:
+      - default
+  
+  webapp:
+    image: quickmemos/webapp:latest
+    restart: unless-stopped
+    depends_on:
+      - server
+    build:
+      context: ./webapp
+      dockerfile: Dockerfile
+    environment:
+      - API_BASE_URL=http://server:3500
+    ports:
+      - "3000:3000"
+    networks:
+      - default
+
+  
